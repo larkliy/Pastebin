@@ -96,7 +96,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         return new(user.Id, user.Username, user.Email, user.CreatedAt, newAccessToken, newRefreshToken);
     }
 
-    public async Task<PaginatedResponse<UserResponse>> GetUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResponse<FoundedUserResponse>> GetUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
@@ -107,7 +107,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             .OrderBy(u => u.Username)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Select(u => new UserResponse(u.Id, u.Username, u.Email, u.CreatedAt))
+            .Select(u => new FoundedUserResponse(u.Id, u.Username, u.CreatedAt))
             .ToListAsync(cancellationToken);
 
         logger.LogInformation("Retrieved page {PageNumber} of users with page size {PageSize}", pageNumber, pageSize);

@@ -2,6 +2,7 @@
 using Pastebin.DTOs.User.Requests;
 using Pastebin.DTOs.User.Responses;
 using Pastebin.Services;
+using System.Security.Claims;
 
 namespace Pastebin.Endpoints;
 
@@ -10,6 +11,7 @@ public static class UserEndpoints
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/users").WithTags("Users");
+
         group.MapPost("/register", async (UserCreateRequest request, IUserService userService) =>
         {
             var response = await userService.CreateUserAsync(request.Username, request.Email, request.Password);
@@ -54,30 +56,41 @@ public static class UserEndpoints
             .WithName("GetUsers")
             .WithSummary("Get paginated list of users")
             .WithDescription("Retrieves a paginated list of users.")
-            .Produces<PaginatedResponse<UserResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginatedResponse<FoundedUserResponse>>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .RequireAuthorization();
 
-        group.MapDelete("/{id:guid}", async (Guid id, IUserService userService) =>
+        group.MapDelete("/me", async (ClaimsPrincipal principal, IUserService userService) =>
         {
-            await userService.DeleteUserByIdAsync(id);
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            await userService.DeleteUserByIdAsync(userId);
             return Results.NoContent();
         })
-            .WithName("DeleteUser")
-            .WithSummary("Deletes a user by their unique ID.")
+            .WithName("DeleteCurrentUser")
+            .WithSummary("Deletes the currently authenticated user's account.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization();
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateUserRequest request, IUserService userService) =>
+        group.MapPut("/me", async (ClaimsPrincipal principal, UpdateUserRequest request, IUserService userService) =>
         {
-            var response = await userService.UpdateUserByIdAsync(id, request);
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var response = await userService.UpdateUserByIdAsync(userId, request);
             return Results.Ok(response);
         })
-            .WithSummary("Update a user's information by their unique ID.")
+            .WithSummary("Update the currently authenticated user's information.")
             .Produces<UserResponse>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .RequireAuthorization();
-
     }
 }
