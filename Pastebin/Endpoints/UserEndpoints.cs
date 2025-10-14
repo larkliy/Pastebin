@@ -21,6 +21,7 @@ public static class UserEndpoints
             .WithSummary("Register a new user")
             .WithDescription("Creates a new user account with the provided username, email, and password.")
             .Produces<UserCreateResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesValidationProblem()
             .AllowAnonymous();
 
@@ -33,6 +34,7 @@ public static class UserEndpoints
             .WithSummary("Authenticate a user")
             .WithDescription("Authenticates a user with the provided username and password, returning JWT tokens upon success.")
             .Produces<UserLoginResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem()
             .AllowAnonymous();
 
@@ -45,6 +47,7 @@ public static class UserEndpoints
             .WithSummary("Refresh JWT tokens")
             .WithDescription("Refreshes JWT tokens using a valid refresh token.")
             .Produces<UserLoginResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem()
             .AllowAnonymous();
 
@@ -68,12 +71,14 @@ public static class UserEndpoints
                 return Results.Unauthorized();
             }
 
-            await userService.DeleteUserByIdAsync(userId);
+            await userService.DeleteUserByIdAsync(userId, userId);
             return Results.NoContent();
         })
             .WithName("DeleteCurrentUser")
             .WithSummary("Deletes the currently authenticated user's account.")
             .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem()
             .RequireAuthorization();
 
@@ -85,7 +90,7 @@ public static class UserEndpoints
                 return Results.Unauthorized();
             }
 
-            var response = await userService.UpdateUserByIdAsync(userId, request);
+            var response = await userService.UpdateUserByIdAsync(userId, userId, request);
             return Results.Ok(response);
         })
             .WithSummary("Update the currently authenticated user's information.")

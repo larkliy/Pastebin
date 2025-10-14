@@ -55,34 +55,27 @@ public class JwtService(IOptions<JwtSettings> jwtSettings, ILogger<JwtService> l
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Value.Issuer,
             ValidAudience = jwtSettings.Value.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.Value.Key))
         };
 
-        try
+        var validationResult = await _tokenHandler.ValidateTokenAsync(token, tokenValidationParameters);
+
+        if (!validationResult.IsValid
+        || validationResult.SecurityToken is not JsonWebToken jsonWebToken
+        || jsonWebToken.Alg != SecurityAlgorithms.HmacSha256Signature)
         {
-            var validationResult = await _tokenHandler.ValidateTokenAsync(token, tokenValidationParameters);
-
-            if (!validationResult.IsValid 
-                || validationResult.SecurityToken is not JsonWebToken jsonWebToken 
-                || jsonWebToken.Alg != SecurityAlgorithms.HmacSha256Signature)
-            {
-                logger.LogWarning("Invalid JWT token");
-                throw new SecurityTokenException("Token is expired or invalid", validationResult.Exception);
-            }
-
-            var principal = new ClaimsPrincipal(validationResult.ClaimsIdentity);
-
-            logger.LogInformation("JWT Token has been succesfully validated");
-
-            return principal;
+            logger.LogWarning("Invalid JWT token");
+            throw new SecurityTokenException("Token is expired or invalid", validationResult.Exception);
         }
-        catch
-        {
-            return null;
-        }
+            
+        var principal = new ClaimsPrincipal(validationResult.ClaimsIdentity);
+
+        logger.LogInformation("JWT Token has been succesfully validated");
+
+        return principal;
     }
 }

@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
+builder.Services.AddScoped<IPasteService, PasteService>();
 
 builder.Services.AddValidation();
 
@@ -98,5 +99,6 @@ app.UseAuthorization();
 
 app.MapUserEndpoints();
 app.MapLikeEndpoints();
+app.MapPasteEndpoints();
 
 app.Run();

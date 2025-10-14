@@ -24,7 +24,7 @@ public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeSe
 
         var likes = await db.Likes
             .Where(l => l.PasteId == pasteId)
-            .OrderBy(l => l.CreatedAt)
+            .OrderByDescending(l => l.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(l => new LikeResponse(l.Id, l.UserId, l.PasteId, l.CreatedAt))
@@ -44,7 +44,7 @@ public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeSe
 
         var likes = await db.Likes
             .Where(l => l.UserId == userId)
-            .OrderBy(l => l.CreatedAt)
+            .OrderByDescending(l => l.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(l => new LikeResponse(l.Id, l.UserId, l.PasteId, l.CreatedAt))
