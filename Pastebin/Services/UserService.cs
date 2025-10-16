@@ -151,6 +151,11 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             user.Email = updateRequest.Email;
         }
 
+        if (!string.IsNullOrWhiteSpace(updateRequest.ImageUrl) && updateRequest.ImageUrl != user.ImageUrl)
+        {
+            user.ImageUrl = updateRequest.ImageUrl;
+        }
+
         if (!string.IsNullOrWhiteSpace(updateRequest.Password))
         {
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateRequest.Password);

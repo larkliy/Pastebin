@@ -23,6 +23,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IPasteService, PasteService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentVoteService, CommentVoteService>();
 
 builder.Services.AddValidation();
 
@@ -102,5 +103,6 @@ app.MapUserEndpoints();
 app.MapLikeEndpoints();
 app.MapPasteEndpoints();
 app.MapCommentEndpoints();
+app.MapCommentVoteEndpoints();
 
 app.Run();

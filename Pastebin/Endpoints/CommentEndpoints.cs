@@ -44,7 +44,7 @@ public static class CommentEndpoints
                 return Results.Unauthorized();
             }
 
-            var response = await commentService.CreateCommentAsync(pasteId, userId, request.Content);
+            var response = await commentService.CreateCommentAsync(pasteId, userId, request);
             return Results.Created($"/api/comments/{response.Id}", response);
         })
             .WithName("CreateComment")
@@ -66,9 +66,15 @@ public static class CommentEndpoints
             .ProducesValidationProblem()
             .AllowAnonymous();
 
-        group.MapPut("/{commentId}", async (Guid commentId, CommentCreateRequest request, ICommentService commentService) =>
+        group.MapPut("/{commentId}", async (Guid commentId, ClaimsPrincipal principal, CommentUpdateRequest request, ICommentService commentService) =>
         {
-            await commentService.UpdateCommentAsync(commentId, request.Content);
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            await commentService.UpdateCommentAsync(commentId, userId, request);
             return Results.NoContent();
         })
             .WithName("UpdateComment")
@@ -78,9 +84,15 @@ public static class CommentEndpoints
             .Produces(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem();
 
-        group.MapDelete("/{commentId}", async (Guid commentId, ICommentService commentService) =>
+        group.MapDelete("/{commentId}", async (Guid commentId, ClaimsPrincipal principal, ICommentService commentService) =>
         {
-            await commentService.DeleteCommentAsync(commentId);
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            await commentService.DeleteCommentAsync(commentId, userId);
             return Results.NoContent();
         })
             .WithName("DeleteComment")

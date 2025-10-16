@@ -10,6 +10,8 @@ public class Comment
     public Guid PasteId { get; set; }
     public Paste? Paste { get; set; }
 
+    public Guid? CommentId { get; set; }
+
     public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
     public virtual ICollection<CommentVote> Votes { get; set; } = new List<CommentVote>();
 }
