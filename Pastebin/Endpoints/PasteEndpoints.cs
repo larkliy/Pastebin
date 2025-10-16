@@ -14,21 +14,21 @@ public static class PasteEndpoints
     {
         var group = app.MapGroup("/api/pastes").WithTags("Pastes").RequireAuthorization();
 
-        group.MapPost("/", async (PasteCreateRequest request, ClaimsPrincipal principal, IPasteService pasteService) =>
+        group.MapGet("/{id:guid}", async (Guid id, [FromHeader(Name = "X-Password")] string? password, ClaimsPrincipal principal, IPasteService pasteService) =>
         {
             var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
             Guid.TryParse(userIdString, out var userId);
 
-            var response = await pasteService.CreatePasteAsync(userId == Guid.Empty ? null : userId, request);
-            return Results.Created($"/api/pastes/{response.Id}", response);
+            var response = await pasteService.GetPasteDetailsAsync(id, userId == Guid.Empty ? null : userId, password);
+            return Results.Ok(response);
         })
-            .WithName("CreatePaste")
-            .WithSummary("Create a new paste")
-            .WithDescription("Creates a new paste with the provided title, content, language, and expiration date.")
-            .Produces<PasteCreateResponse>(StatusCodes.Status201Created)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
-
+            .WithName("GetPasteDetails")
+            .WithSummary("Get a single paste by ID")
+            .WithDescription("Retrieves a paste. For private pastes, requires ownership or the correct password passed in the 'X-Password' header.")
+            .Produces<PasteDetailsResponse>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .AllowAnonymous();        
+            
         group.MapGet("/my-pastes", async (ClaimsPrincipal principal, int pageNumber, int pageSize, IPasteService pasteService) =>
         {
             var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -57,6 +57,22 @@ public static class PasteEndpoints
             .Produces<PaginatedResponse<PasteResponse>>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .AllowAnonymous();
+
+        group.MapPost("/", async (PasteCreateRequest request, ClaimsPrincipal principal, IPasteService pasteService) =>
+        {
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            Guid.TryParse(userIdString, out var userId);
+
+            var response = await pasteService.CreatePasteAsync(userId == Guid.Empty ? null : userId, request);
+            return Results.Created($"/api/pastes/{response.Id}", response);
+        })
+            .WithName("CreatePaste")
+            .WithSummary("Create a new paste")
+            .WithDescription("Creates a new paste with the provided title, content, language, and expiration date.")
+            .Produces<PasteCreateResponse>(StatusCodes.Status201Created)
+            .ProducesValidationProblem()
+            .AllowAnonymous();
+
 
         group.MapPut("/{id:guid}", async (Guid id, PasteUpdateRequest request, ClaimsPrincipal principal, IPasteService pasteService) =>
         {
@@ -90,20 +106,5 @@ public static class PasteEndpoints
             .WithName("DeletePaste")
             .WithSummary("Delete a paste")
             .WithDescription("Deletes a specific paste.");
-
-        group.MapGet("/{id:guid}", async (Guid id, [FromHeader(Name = "X-Password")] string? password, ClaimsPrincipal principal, IPasteService pasteService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            Guid.TryParse(userIdString, out var userId);
-
-            var response = await pasteService.GetPasteDetailsAsync(id, userId == Guid.Empty ? null : userId, password);
-            return Results.Ok(response);
-        })
-            .WithName("GetPasteDetails")
-            .WithSummary("Get a single paste by ID")
-            .WithDescription("Retrieves a paste. For private pastes, requires ownership or the correct password passed in the 'X-Password' header.")
-            .Produces<PasteDetailsResponse>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .AllowAnonymous();
     }
 }

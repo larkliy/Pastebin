@@ -42,7 +42,7 @@ public static class LikeEndpoints
             .ProducesValidationProblem()
             .AllowAnonymous();
 
-        group.MapPost("/paste", async (ClaimsPrincipal principal, LikeCreateRequest request, ILikeService likeService) =>
+        group.MapPost("/paste", async (ClaimsPrincipal principal, Guid pasteId, ILikeService likeService) =>
         {
             var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId))
@@ -50,7 +50,7 @@ public static class LikeEndpoints
                 return Results.Unauthorized();
             }
 
-            var response = await likeService.LikePasteAsync(userId, request.PasteId);
+            var response = await likeService.LikePasteAsync(userId, pasteId);
             return Results.Created($"/api/likes/paste/{response.Id}", response);
         })
             .WithName("LikePaste")
