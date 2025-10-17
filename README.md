@@ -1,6 +1,6 @@
 # Pastebin API Clone 📋
 
-Welcome to the Pastebin API clone! This is a comprehensive backend service built with modern .NET 8, showcasing best practices for building robust and scalable web APIs. It emulates the core functionality of services like Pastebin, allowing users to create, share, and manage text snippets (pastes).
+Welcome to the Pastebin API clone! This is a comprehensive backend service built with modern .NET 10, showcasing best practices for building robust and scalable web APIs. It emulates the core functionality of services like Pastebin, allowing users to create, share, and manage text snippets (pastes).
 
 This project serves as a great example of using Minimal APIs, JWT authentication, Entity Framework Core with a service-layer architecture, and custom exception handling.
 
@@ -21,8 +21,8 @@ This project serves as a great example of using Minimal APIs, JWT authentication
 
 ## Tech Stack 🛠️
 
-*   **Backend**: .NET 8 / ASP.NET Core (using Minimal APIs)
-*   **Database**: Entity Framework Core 8 with SQLite
+*   **Backend**: .NET 10 / ASP.NET Core (using Minimal APIs)
+*   **Database**: Entity Framework Core 9 with SQLite
 *   **Authentication**: JSON Web Tokens (JWT)
 *   **Password Hashing**: BCrypt.Net
 *   **Testing**: xUnit, Moq, FluentAssertions
