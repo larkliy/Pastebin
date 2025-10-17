@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pastebin.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+339d49c1b639008967b71fdb53c484f9e8d3911b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dee1f038ecabca9d76b7fb76b5c4c89f22c25cdc")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pastebin.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pastebin.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
