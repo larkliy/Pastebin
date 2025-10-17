@@ -59,7 +59,7 @@ public static class UserEndpoints
             .WithName("GetUsers")
             .WithSummary("Get paginated list of users")
             .WithDescription("Retrieves a paginated list of users.")
-            .Produces<PaginatedResponse<FoundedUserResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginatedResponse<FoundUserResponseUser>>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .RequireAuthorization();
 
@@ -71,7 +71,7 @@ public static class UserEndpoints
                 return Results.Unauthorized();
             }
 
-            await userService.DeleteUserByIdAsync(userId, userId);
+            await userService.DeleteUserByIdAsync(userId);
             return Results.NoContent();
         })
             .WithName("DeleteCurrentUser")
@@ -90,7 +90,7 @@ public static class UserEndpoints
                 return Results.Unauthorized();
             }
 
-            var response = await userService.UpdateUserByIdAsync(userId, userId, request);
+            var response = await userService.UpdateUserByIdAsync(userId, request);
             return Results.Ok(response);
         })
             .WithSummary("Update the currently authenticated user's information.")

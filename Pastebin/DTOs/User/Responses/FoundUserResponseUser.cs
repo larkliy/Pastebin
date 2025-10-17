@@ -1,6 +1,6 @@
 ﻿namespace Pastebin.DTOs.User.Responses;
 
-public record FoundedUserResponse(
+public record FoundUserResponseUser(
     Guid Id,
     string Username,
     DateTime CreatedAt);

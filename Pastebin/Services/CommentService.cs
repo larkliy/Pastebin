@@ -106,53 +106,63 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var allComments = await db.Comments
-            .Where(c => c.PasteId == pasteId)
-            .Include(c => c.User)
-            .Include(c => c.Votes)
+        var totalTopLevelComments = await db.Comments
+            .CountAsync(c => c.PasteId == pasteId && c.CommentId == null, cancellationToken);
+
+        if (totalTopLevelComments == 0)
+        {
+            return new([], 0, pageNumber, pageSize);
+        }
+
+        var topLevelComments = await db.Comments
+            .Where(c => c.PasteId == pasteId && c.CommentId == null)
             .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync(cancellationToken);
-
-        var commentMap = allComments.ToDictionary(
-            c => c.Id,
-            c => new CommentResponse(
-                c.Id,
-                c.Content,
-                c.CreatedAt,
-                c.Votes.Count(v => v.IsUpvote),
-                c.Votes.Count(v => !v.IsUpvote),
-                c.User?.Username,
-                c.User?.ImageUrl
-            )
-        );
-
-        var topLevelComments = new List<CommentResponse>();
-
-        foreach (var comment in allComments)
-        {
-            if (comment.CommentId.HasValue && commentMap.TryGetValue(comment.CommentId.Value, out var parentComment))
-            {
-                parentComment.Replies.Add(commentMap[comment.Id]);
-            }
-            else
-            {
-                topLevelComments.Add(commentMap[comment.Id]);
-            }
-        }
-        
-        foreach (var comment in commentMap.Values)
-        {
-            comment.Replies = comment.Replies.OrderBy(r => r.CreatedAt).ToList();
-        }
-
-        var paginatedTopLevelComments = topLevelComments
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .Include(c => c.User)
+            .Include(c => c.Votes)
+            .ToListAsync(cancellationToken);
+
+        var topLevelCommentIds = topLevelComments.Select(c => c.Id).ToList();
+
+        var replies = await db.Comments
+            .Where(c => c.CommentId.HasValue && topLevelCommentIds.Contains(c.CommentId.Value))
+            .Include(c => c.User)
+            .Include(c => c.Votes)
+            .OrderBy(c => c.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var topLevelCommentResponses = topLevelComments.Select(c => new CommentResponse(
+            c.Id,
+            c.Content,
+            c.CreatedAt,
+            c.Votes.Count(v => v.IsUpvote),
+            c.Votes.Count(v => !v.IsUpvote),
+            c.User?.Username,
+            c.User?.ImageUrl
+        )).ToList();
+
+        var commentResponseMap = topLevelCommentResponses.ToDictionary(c => c.Id);
+
+        foreach (var reply in replies)
+        {
+            if (commentResponseMap.TryGetValue(reply.CommentId!.Value, out var parentCommentResponse))
+            {
+                parentCommentResponse.Replies.Add(new CommentResponse(
+                    reply.Id,
+                    reply.Content,
+                    reply.CreatedAt,
+                    reply.Votes.Count(v => v.IsUpvote),
+                    reply.Votes.Count(v => !v.IsUpvote),
+                    reply.User?.Username,
+                    reply.User?.ImageUrl
+                ));
+            }
+        }
 
         logger.LogInformation("Retrieved page {PageNumber} of comments for paste ID '{PasteId}' with page size {PageSize}", pageNumber, pasteId, pageSize);
 
-        return new(paginatedTopLevelComments, topLevelComments.Count, pageNumber, pageSize);
+        return new(topLevelCommentResponses, totalTopLevelComments, pageNumber, pageSize);
     }
 
     public async Task<PaginatedResponse<CommentResponse>> GetCommentsByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -209,15 +219,5 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
         }
 
         db.Comments.Remove(comment!);
-
-        if (comment.CommentId.HasValue)
-        {
-            var parentComment = await db.Comments.FindAsync(comment.CommentId.Value, cancellationToken);
-            if (parentComment != null)
-            {
-                parentComment.Replies.Remove(comment);
-                await db.SaveChangesAsync(cancellationToken);
-            }
-        }
     }
 }

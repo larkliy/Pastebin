@@ -96,7 +96,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         return new(user.Id, user.Username, user.Email, user.CreatedAt, newAccessToken, newRefreshToken);
     }
 
-    public async Task<PaginatedResponse<FoundedUserResponse>> GetUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResponse<FoundUserResponseUser>> GetUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
@@ -107,7 +107,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             .OrderBy(u => u.Username)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Select(u => new FoundedUserResponse(u.Id, u.Username, u.CreatedAt))
+            .Select(u => new FoundUserResponseUser(u.Id, u.Username, u.CreatedAt))
             .ToListAsync(cancellationToken);
 
         logger.LogInformation("Retrieved page {PageNumber} of users with page size {PageSize}", pageNumber, pageSize);
@@ -115,14 +115,8 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         return new(users, totalUsers, pageNumber, pageSize);
     }
 
-    public async Task<UserResponse> UpdateUserByIdAsync(Guid userId, Guid currentUserId, UpdateUserRequest updateRequest, CancellationToken cancellationToken = default)
+    public async Task<UserResponse> UpdateUserByIdAsync(Guid userId, UpdateUserRequest updateRequest, CancellationToken cancellationToken = default)
     {
-        if (userId != currentUserId)
-        {
-            logger.LogWarning("Attempted to update user with ID '{UserId}' by user with ID '{CurrentUserId}'", userId, currentUserId);
-            throw new UnauthorizedAccessException("You are not authorized to update this user.");
-        }
-        
         var user = await db.Users.FindAsync([userId], cancellationToken);
 
         if (user == null)
@@ -167,14 +161,8 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         return new(user.Id, user.Username, user.Email, user.CreatedAt);
     }
 
-    public async Task DeleteUserByIdAsync(Guid userId, Guid currentUserId, CancellationToken cancellationToken = default)
+    public async Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        if (userId != currentUserId)
-        {
-            logger.LogWarning("User '{CurrentUserId}' attempted to delete user '{UserId}' owned by another user '{OwnerId}'.", currentUserId, userId, currentUserId);
-            throw new UserNotFoundException($"User with ID '{userId}' not found.");
-        }
-
         var user = await db.Users.FindAsync([userId], cancellationToken);
 
         if (user == null)

@@ -10,10 +10,12 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         builder.HasOne(e => e.User)
               .WithMany(u => u.Comments)
               .HasForeignKey(e => e.UserId)
               .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasOne(e => e.Paste)
               .WithMany(p => p.Comments)
               .HasForeignKey(e => e.PasteId)
