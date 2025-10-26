@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Pastebin.DTOs.Shared;
 using Pastebin.DTOs.User.Requests;
 using Pastebin.DTOs.User.Responses;
+using Pastebin.Extensions;
 using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Endpoints;
@@ -47,25 +48,25 @@ public static class UserEndpoints
 
     private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteCurrentUser(ClaimsPrincipal principal, IUserService userService)
     {
-        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdString, out var userId))
+        var userId = principal.GetUserId();
+        if (userId is null)
         {
             return TypedResults.Unauthorized();
         }
 
-        await userService.DeleteUserByIdAsync(userId);
+        await userService.DeleteUserByIdAsync(userId.Value);
         return TypedResults.NoContent();
     }
 
     private static async Task<Results<Ok<UserResponse>, UnauthorizedHttpResult>> UpdateCurrentUser(ClaimsPrincipal principal, UpdateUserRequest request, IUserService userService)
     {
-        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdString, out var userId))
+        var userId = principal.GetUserId();
+        if (userId is null)
         {
             return TypedResults.Unauthorized();
         }
 
-        var response = await userService.UpdateUserByIdAsync(userId, request);
+        var response = await userService.UpdateUserByIdAsync(userId.Value, request);
         return TypedResults.Ok(response);
     }
 }

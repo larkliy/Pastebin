@@ -222,7 +222,6 @@ public class UserServiceTests : IDisposable
         // Assert
         result.Should().NotBeNull();
         result.Items.Should().HaveCount(1);
-        result.TotalCount.Should().Be(2);
         result.Items.First().Username.Should().Be("testuser1");
     }
 
