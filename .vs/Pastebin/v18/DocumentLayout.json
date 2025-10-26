@@ -1,7 +1,20 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Heller\\source\\repos\\Pastebin\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\endpoints\\commentvoteendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\endpoints\\commentvoteendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\dtos\\commentvote\\requests\\commentvoterequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\dtos\\commentvote\\requests\\commentvoterequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +22,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 46,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CommentVoteRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
+              "RelativeDocumentMoniker": "Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
+              "RelativeToolTip": "Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-18T20:34:23.01Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:42:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
@@ -190,6 +216,32 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CommentVoteEndpoints.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
+              "RelativeToolTip": "Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABQAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-18T20:30:47.507Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Program.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
+              "RelativeToolTip": "Pastebin\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-18T20:27:28.921Z",
+              "EditorCaption": ""
             }
           ]
         }

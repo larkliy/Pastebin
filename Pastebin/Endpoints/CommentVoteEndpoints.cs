@@ -9,11 +9,11 @@ public static class CommentVoteEndpoints
 {
     public static void MapCommentVoteEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/comments/{commentId:guid}/vote")
+        var group = app.MapGroup("/api/comments/vote")
             .WithTags("Comment Votes")
             .RequireAuthorization();
 
-        group.MapPost("/", async (Guid commentId, CommentVoteRequest request, ClaimsPrincipal principal, ICommentVoteService voteService) =>
+        group.MapPost("/", async (CommentVoteRequest request, ClaimsPrincipal principal, ICommentVoteService voteService) =>
         {
             var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId))
@@ -21,7 +21,7 @@ public static class CommentVoteEndpoints
                 return Results.Unauthorized();
             }
 
-            var response = await voteService.VoteAsync(commentId, userId, request.IsUpvote);
+            var response = await voteService.VoteAsync(request.CommentId, userId, request.IsUpvote);
             return Results.Ok(response);
         })
         .WithName("VoteOnComment")
