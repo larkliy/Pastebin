@@ -2,10 +2,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Pastebin.ConfigurationSettings;
+using Pastebin.Services.Interfaces;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class JwtService(IOptions<JwtSettings> jwtSettings, ILogger<JwtService> logger) : IJwtService
 {

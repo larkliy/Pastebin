@@ -2,7 +2,7 @@ using Pastebin.DTOs.Paste.Requests;
 using Pastebin.DTOs.Paste.Responses;
 using Pastebin.DTOs.Shared;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface IPasteService
 {

@@ -5,8 +5,9 @@ using Pastebin.DTOs.User.Requests;
 using Pastebin.DTOs.User.Responses;
 using Pastebin.Exceptions.User;
 using Pastebin.Models;
+using Pastebin.Services.Interfaces;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserService> logger) : IUserService
 {
@@ -101,18 +102,21 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var totalUsers = await db.Users.CountAsync(cancellationToken);
+        var usersQuery = db.Users
+            .OrderBy(u => u.Username);
 
-        var users = await db.Users
-            .OrderBy(u => u.Username)
+        var users = await usersQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(u => new FoundUserResponseUser(u.Id, u.Username, u.CreatedAt))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = users.Count > pageSize;
+        var items = hasNextPage ? users.Take(pageSize) : users;
+
         logger.LogInformation("Retrieved page {PageNumber} of users with page size {PageSize}", pageNumber, pageSize);
 
-        return new(users, totalUsers, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task<UserResponse> UpdateUserByIdAsync(Guid userId, UpdateUserRequest updateRequest, CancellationToken cancellationToken = default)
@@ -175,5 +179,21 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         await db.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("Deleted user with ID '{UserId}'", userId);
+    }
+
+    public async Task LogoutAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await db.Users.FindAsync([userId], cancellationToken);
+
+        if (user == null)
+        {
+            logger.LogWarning("Attempted to logout non-existent user with ID '{UserId}'", userId);
+            throw new UserNotFoundException($"User with ID '{userId}' not found.");
+        }
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

@@ -3,12 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\Heller\\source\\repos\\Pastebin\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\endpoints\\commentvoteendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\endpoints\\commentvoteendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\endpoints\\userendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\endpoints\\userendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\dtos\\commentvote\\requests\\commentvoterequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\dtos\\commentvote\\requests\\commentvoterequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\endpoints\\likeendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\endpoints\\likeendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\endpoints\\commentendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\endpoints\\commentendpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\dtos\\shared\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\dtos\\shared\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,19 +38,75 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 46,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0174dea2-fdbe-4ef1-8f99-c0beae78880f}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "CommentVoteRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
-              "RelativeDocumentMoniker": "Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
-              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
-              "RelativeToolTip": "Pastebin\\DTOs\\CommentVote\\Requests\\CommentVoteRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAVAAAAAAAAAA==",
+              "Title": "LikeEndpoints.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\LikeEndpoints.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Endpoints\\LikeEndpoints.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\LikeEndpoints.cs",
+              "RelativeToolTip": "Pastebin\\Endpoints\\LikeEndpoints.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T20:34:23.01Z",
+              "WhenOpened": "2025-10-26T09:40:03.655Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserEndpoints.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\UserEndpoints.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Endpoints\\UserEndpoints.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\UserEndpoints.cs",
+              "RelativeToolTip": "Pastebin\\Endpoints\\UserEndpoints.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:39:45.926Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CommentEndpoints.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentEndpoints.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Endpoints\\CommentEndpoints.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentEndpoints.cs",
+              "RelativeToolTip": "Pastebin\\Endpoints\\CommentEndpoints.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAAAAsAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:37:23.278Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PaginatedResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "RelativeDocumentMoniker": "Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "RelativeToolTip": "Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:31:40.259Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "RelativeToolTip": "Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:29:27.353Z",
               "EditorCaption": ""
             },
             {
@@ -218,27 +290,31 @@
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "CommentVoteEndpoints.cs",
-              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
-              "RelativeDocumentMoniker": "Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
-              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
-              "RelativeToolTip": "Pastebin\\Endpoints\\CommentVoteEndpoints.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABQAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T20:30:47.507Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Implementations\\UserService.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Services\\Implementations\\UserService.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Implementations\\UserService.cs",
+              "RelativeToolTip": "Pastebin\\Services\\Implementations\\UserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:22:32.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
               "RelativeDocumentMoniker": "Pastebin\\Program.cs",
               "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
               "RelativeToolTip": "Pastebin\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABkAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-18T20:27:28.921Z",
               "EditorCaption": ""

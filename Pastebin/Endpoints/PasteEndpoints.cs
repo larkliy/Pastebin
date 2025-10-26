@@ -1,10 +1,11 @@
 
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Pastebin.DTOs.Paste.Requests;
 using Pastebin.DTOs.Paste.Responses;
 using Pastebin.DTOs.Shared;
-using Pastebin.Services;
+using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Endpoints;
 
@@ -14,97 +15,71 @@ public static class PasteEndpoints
     {
         var group = app.MapGroup("/api/pastes").WithTags("Pastes").RequireAuthorization();
 
-        group.MapGet("/{id:guid}", async (Guid id, [FromHeader(Name = "X-Password")] string? password, ClaimsPrincipal principal, IPasteService pasteService) =>
+        group.MapGet("/{id:guid}", GetPasteDetails).AllowAnonymous();
+        group.MapGet("/my-pastes", GetMyPastes);
+        group.MapGet("/", GetPastes).AllowAnonymous();
+        group.MapPost("/", CreatePaste).AllowAnonymous();
+        group.MapPut("/{id:guid}", UpdatePaste);
+        group.MapDelete("/{id:guid}", DeletePaste);
+    }
+
+    private static async Task<Ok<PasteDetailsResponse>> GetPasteDetails(Guid id, [FromHeader(Name = "X-Password")] string? password, ClaimsPrincipal principal, IPasteService pasteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        Guid.TryParse(userIdString, out var userId);
+
+        var response = await pasteService.GetPasteDetailsAsync(id, userId == Guid.Empty ? null : userId, password);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Results<Ok<PaginatedResponse<PasteResponse>>, UnauthorizedHttpResult>> GetMyPastes(ClaimsPrincipal principal, int pageNumber, int pageSize, IPasteService pasteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            Guid.TryParse(userIdString, out var userId);
+            return TypedResults.Unauthorized();
+        }
 
-            var response = await pasteService.GetPasteDetailsAsync(id, userId == Guid.Empty ? null : userId, password);
-            return Results.Ok(response);
-        })
-            .WithName("GetPasteDetails")
-            .WithSummary("Get a single paste by ID")
-            .WithDescription("Retrieves a paste. For private pastes, requires ownership or the correct password passed in the 'X-Password' header.")
-            .Produces<PasteDetailsResponse>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .AllowAnonymous();        
-            
-        group.MapGet("/my-pastes", async (ClaimsPrincipal principal, int pageNumber, int pageSize, IPasteService pasteService) =>
+        var response = await pasteService.GetPastesByUserIdAsync(userId, pageNumber, pageSize);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Ok<PaginatedResponse<PasteResponse>>> GetPastes(int pageNumber, int pageSize, IPasteService pasteService)
+    {
+        var response = await pasteService.GetPastesAsync(pageNumber, pageSize);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Created<PasteCreateResponse>> CreatePaste(PasteCreateRequest request, ClaimsPrincipal principal, IPasteService pasteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        Guid.TryParse(userIdString, out var userId);
+
+        var response = await pasteService.CreatePasteAsync(userId == Guid.Empty ? null : userId, request);
+        return TypedResults.Created($"/api/pastes/{response.Id}", response);
+    }
+
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdatePaste(Guid id, PasteUpdateRequest request, ClaimsPrincipal principal, IPasteService pasteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
+            return TypedResults.Unauthorized();
+        }
 
-            var response = await pasteService.GetPastesByUserIdAsync(userId, pageNumber, pageSize);
-            return Results.Ok(response);
-        })
-            .WithName("GetMyPastes")
-            .WithSummary("Get the current user's pastes")
-            .WithDescription("Retrieves a list of pastes for the currently authenticated user.")
-            .Produces<PaginatedResponse<PasteResponse>>(StatusCodes.Status200OK)
-            .ProducesValidationProblem();
+        await pasteService.UpdatePasteAsync(id, userId, request);
+        return TypedResults.NoContent();
+    }
 
-        group.MapGet("/", async (int pageNumber, int pageSize, IPasteService pasteService) =>
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeletePaste(Guid id, ClaimsPrincipal principal, IPasteService pasteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var response = await pasteService.GetPastesAsync(pageNumber, pageSize);
-            return Results.Ok(response);
-        })
-            .WithName("GetPastes")
-            .WithSummary("Get all pastes")
-            .WithDescription("Retrieves a list of all pastes.")
-            .Produces<PaginatedResponse<PasteResponse>>(StatusCodes.Status200OK)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
+            return TypedResults.Unauthorized();
+        }
 
-        group.MapPost("/", async (PasteCreateRequest request, ClaimsPrincipal principal, IPasteService pasteService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            Guid.TryParse(userIdString, out var userId);
-
-            var response = await pasteService.CreatePasteAsync(userId == Guid.Empty ? null : userId, request);
-            return Results.Created($"/api/pastes/{response.Id}", response);
-        })
-            .WithName("CreatePaste")
-            .WithSummary("Create a new paste")
-            .WithDescription("Creates a new paste with the provided title, content, language, and expiration date.")
-            .Produces<PasteCreateResponse>(StatusCodes.Status201Created)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
-
-
-        group.MapPut("/{id:guid}", async (Guid id, PasteUpdateRequest request, ClaimsPrincipal principal, IPasteService pasteService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            await pasteService.UpdatePasteAsync(id, userId, request);
-            return Results.NoContent();
-        })
-            .WithName("UpdatePaste")
-            .WithSummary("Update a paste")
-            .WithDescription("Updates a paste with the provided title, content, or privacy settings.")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem()
-            .Produces(StatusCodes.Status404NotFound);
-
-        group.MapDelete("/{id:guid}", async (Guid id, ClaimsPrincipal principal, IPasteService pasteService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            await pasteService.DeletePasteAsync(id, userId);
-            return Results.NoContent();
-        })
-            .WithName("DeletePaste")
-            .WithSummary("Delete a paste")
-            .WithDescription("Deletes a specific paste.");
+        await pasteService.DeletePasteAsync(id, userId);
+        return TypedResults.NoContent();
     }
 }

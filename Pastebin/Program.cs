@@ -6,7 +6,8 @@ using Pastebin.Application;
 using Pastebin.ConfigurationSettings;
 using Pastebin.Endpoints;
 using Pastebin.Handlers;
-using Pastebin.Services;
+using Pastebin.Services.Implementations;
+using Pastebin.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,8 @@ builder.Services.AddOptions<JwtSettings>()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IPasteService, PasteService>();

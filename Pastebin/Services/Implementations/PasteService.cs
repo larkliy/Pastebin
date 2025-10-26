@@ -6,8 +6,9 @@ using Pastebin.DTOs.Paste.Responses;
 using Pastebin.DTOs.Shared;
 using Pastebin.Exceptions.Paste;
 using Pastebin.Models;
+using Pastebin.Services.Interfaces;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class PasteService(AppDbContext db, ILogger<PasteService> logger) : IPasteService
 {
@@ -40,20 +41,23 @@ public class PasteService(AppDbContext db, ILogger<PasteService> logger) : IPast
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var totalPastes = await db.Pastes.CountAsync(cancellationToken);
-
-        var pastes = await db.Pastes
+        var pastesQuery = db.Pastes
             .AsNoTracking()
             .Where(p => !p.IsPrivate)
-            .OrderByDescending(p => p.CreatedAt)
+            .OrderByDescending(p => p.CreatedAt);
+
+        var pastes = await pastesQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(p => new PasteResponse(p.Id, p.Title, p.IsPrivate, p.CreatedAt))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = pastes.Count > pageSize;
+        var items = hasNextPage ? pastes.Take(pageSize) : pastes;
+
         logger.LogInformation("Retrieved page {PageNumber} of pastes with page size {PageSize}", pageNumber, pageSize);
 
-        return new(pastes, totalPastes, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
 
     }
 
@@ -62,20 +66,23 @@ public class PasteService(AppDbContext db, ILogger<PasteService> logger) : IPast
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var totalPastes = await db.Pastes.CountAsync(p => p.UserId == userId, cancellationToken);
-
-        var pastes = await db.Pastes
+        var pastesQuery = db.Pastes
             .AsNoTracking()
             .Where(p => p.UserId == userId)
-            .OrderByDescending(p => p.CreatedAt)
+            .OrderByDescending(p => p.CreatedAt);
+
+        var pastes = await pastesQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(p => new PasteResponse(p.Id, p.Title, p.IsPrivate, p.CreatedAt))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = pastes.Count > pageSize;
+        var items = hasNextPage ? pastes.Take(pageSize) : pastes;
+
         logger.LogInformation("Retrieved page {PageNumber} of pastes for user ID '{UserId}' with page size {PageSize}", pageNumber, userId, pageSize);
 
-        return new(pastes, totalPastes, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task<PasteDetailsResponse> GetPasteDetailsAsync(Guid pasteId, Guid? userId, string? password, CancellationToken cancellationToken = default)

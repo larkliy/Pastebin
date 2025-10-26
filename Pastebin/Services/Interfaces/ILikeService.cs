@@ -1,7 +1,7 @@
 using Pastebin.DTOs.Like.Responses;
 using Pastebin.DTOs.Shared;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface ILikeService
 {

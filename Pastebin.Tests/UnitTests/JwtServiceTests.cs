@@ -5,7 +5,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Pastebin.ConfigurationSettings;
-using Pastebin.Services;
+using Pastebin.Services.Implementations;
+using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Tests.UnitTests;
 

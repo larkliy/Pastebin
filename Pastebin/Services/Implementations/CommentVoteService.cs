@@ -3,8 +3,9 @@ using Pastebin.Application;
 using Pastebin.DTOs.CommentVote.Responses;
 using Pastebin.Exceptions.Comment;
 using Pastebin.Models;
+using Pastebin.Services.Interfaces;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class CommentVoteService(AppDbContext db, ILogger<CommentVoteService> logger) : ICommentVoteService
 {

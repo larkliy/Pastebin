@@ -6,8 +6,9 @@ using Pastebin.DTOs.Shared;
 using Pastebin.Exceptions.Comment;
 using Pastebin.Exceptions.User;
 using Pastebin.Models;
+using Pastebin.Services.Interfaces;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class CommentService(AppDbContext db, ILogger<CommentService> logger) : ICommentService
 {
@@ -106,24 +107,26 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var totalTopLevelComments = await db.Comments
-            .CountAsync(c => c.PasteId == pasteId && c.CommentId == null, cancellationToken);
-
-        if (totalTopLevelComments == 0)
-        {
-            return new([], 0, pageNumber, pageSize);
-        }
-
-        var topLevelComments = await db.Comments
+        var topLevelCommentsQuery = db.Comments
             .Where(c => c.PasteId == pasteId && c.CommentId == null)
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.CreatedAt);
+
+        var topLevelComments = await topLevelCommentsQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Include(c => c.User)
             .Include(c => c.Votes)
             .ToListAsync(cancellationToken);
 
-        var topLevelCommentIds = topLevelComments.Select(c => c.Id).ToList();
+        var hasNextPage = topLevelComments.Count > pageSize;
+        var items = hasNextPage ? topLevelComments.Take(pageSize).ToList() : topLevelComments;
+
+        if (!items.Any())
+        {
+            return new PaginatedResponse<CommentResponse>([], pageNumber, pageSize, false);
+        }
+
+        var topLevelCommentIds = items.Select(c => c.Id).ToList();
 
         var replies = await db.Comments
             .Where(c => c.CommentId.HasValue && topLevelCommentIds.Contains(c.CommentId.Value))
@@ -132,7 +135,7 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
             .OrderBy(c => c.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var topLevelCommentResponses = topLevelComments.Select(c => new CommentResponse(
+        var topLevelCommentResponses = items.Select(c => new CommentResponse(
             c.Id,
             c.Content,
             c.CreatedAt,
@@ -162,7 +165,7 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
 
         logger.LogInformation("Retrieved page {PageNumber} of comments for paste ID '{PasteId}' with page size {PageSize}", pageNumber, pasteId, pageSize);
 
-        return new(topLevelCommentResponses, totalTopLevelComments, pageNumber, pageSize);
+        return new(topLevelCommentResponses, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task<PaginatedResponse<CommentResponse>> GetCommentsByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -170,15 +173,15 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var count = await db.Comments.CountAsync(c => c.UserId == userId, cancellationToken);
-
-        var comments = await db.Comments
+        var commentsQuery = db.Comments
             .Where(c => c.UserId == userId)
             .Include(c => c.User)
             .Include(c => c.Votes)
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.CreatedAt);
+
+        var comments = await commentsQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(c => new CommentResponse(
                             c.Id,
                             c.Content,
@@ -189,9 +192,12 @@ public class CommentService(AppDbContext db, ILogger<CommentService> logger) : I
                             c.User.ImageUrl))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = comments.Count > pageSize;
+        var items = hasNextPage ? comments.Take(pageSize) : comments;
+
         logger.LogInformation("Retrieved page {PageNumber} of comments for user ID '{UserId}' with page size {PageSize}", pageNumber, userId, pageSize);
 
-        return new(comments, count, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task UpdateCommentAsync(Guid commentId, Guid currentUserId, CommentUpdateRequest request, CancellationToken cancellationToken = default)

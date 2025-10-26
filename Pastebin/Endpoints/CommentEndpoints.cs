@@ -1,8 +1,9 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Pastebin.DTOs.Comment.Requests;
 using Pastebin.DTOs.Comment.Responses;
 using Pastebin.DTOs.Shared;
-using Pastebin.Services;
+using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Endpoints;
 
@@ -12,94 +13,65 @@ public static class CommentEndpoints
     {
         var group = app.MapGroup("/api/comments").WithTags("Comments").RequireAuthorization();
 
-        group.MapGet("/paste/{pasteId}", async (Guid pasteId, int pageNumber, int pageSize, ICommentService commentService) =>
+        group.MapGet("/paste/{pasteId}", GetComments).AllowAnonymous();
+        group.MapGet("/user/{userId}", GetCommentsByUserId).AllowAnonymous();
+        group.MapPost("/paste/{pasteId}", CreateComment);
+        group.MapGet("/{commentId}", GetComment).AllowAnonymous();
+        group.MapPut("/{commentId}", UpdateComment);
+        group.MapDelete("/{commentId}", DeleteComment);
+    }
+
+    private static async Task<Ok<PaginatedResponse<CommentResponse>>> GetComments(Guid pasteId, int pageNumber, int pageSize, ICommentService commentService)
+    {
+        var response = await commentService.GetCommentsAsync(pasteId, pageNumber, pageSize);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Ok<PaginatedResponse<CommentResponse>>> GetCommentsByUserId(Guid userId, int pageNumber, int pageSize, ICommentService commentService)
+    {
+        var response = await commentService.GetCommentsByUserIdAsync(userId, pageNumber, pageSize);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Results<Created<CommentResponse>, UnauthorizedHttpResult>> CreateComment(Guid pasteId, CommentCreateRequest request, ClaimsPrincipal principal, ICommentService commentService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var response = await commentService.GetCommentsAsync(pasteId, pageNumber, pageSize);
-            return Results.Ok(response);
-        })
-            .WithName("GetComments")
-            .WithSummary("Get comments")
-            .WithDescription("Retrieves a list of comments for a given paste ID.")
-            .Produces<PaginatedResponse<CommentResponse>>(StatusCodes.Status200OK)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
+            return TypedResults.Unauthorized();
+        }
 
-        group.MapGet("/user/{userId}", async (Guid userId, int pageNumber, int pageSize, ICommentService commentService) =>
+        var response = await commentService.CreateCommentAsync(pasteId, userId, request);
+        return TypedResults.Created($"/api/comments/{response.Id}", response);
+    }
+
+    private static async Task<Ok<CommentResponse>> GetComment(Guid commentId, ICommentService commentService)
+    {
+        var response = await commentService.GetCommentAsync(commentId);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> UpdateComment(Guid commentId, ClaimsPrincipal principal, CommentUpdateRequest request, ICommentService commentService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var response = await commentService.GetCommentsByUserIdAsync(userId, pageNumber, pageSize);
-            return Results.Ok(response);
-        })
-            .WithName("GetCommentsByUserId")
-            .WithSummary("Get comments by user ID")
-            .WithDescription("Retrieves a list of comments for a given user ID.")
-            .Produces<PaginatedResponse<CommentResponse>>(StatusCodes.Status200OK)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
+            return TypedResults.Unauthorized();
+        }
 
-        group.MapPost("/paste/{pasteId}", async (Guid pasteId, CommentCreateRequest request, ClaimsPrincipal principal, ICommentService commentService) =>
+        await commentService.UpdateCommentAsync(commentId, userId, request);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteComment(Guid commentId, ClaimsPrincipal principal, ICommentService commentService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
+            return TypedResults.Unauthorized();
+        }
 
-            var response = await commentService.CreateCommentAsync(pasteId, userId, request);
-            return Results.Created($"/api/comments/{response.Id}", response);
-        })
-            .WithName("CreateComment")
-            .WithSummary("Create a comment")
-            .WithDescription("Creates a new comment with the provided content.")
-            .Produces<CommentResponse>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem();
-
-        group.MapGet("/{commentId}", async (Guid commentId, ICommentService commentService) =>
-        {
-            var response = await commentService.GetCommentAsync(commentId);
-            return Results.Ok(response);
-        })
-            .WithName("GetComment")
-            .WithSummary("Get a comment")
-            .WithDescription("Retrieves a comment with the provided ID.")
-            .Produces<CommentResponse>(StatusCodes.Status200OK)
-            .ProducesValidationProblem()
-            .AllowAnonymous();
-
-        group.MapPut("/{commentId}", async (Guid commentId, ClaimsPrincipal principal, CommentUpdateRequest request, ICommentService commentService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            await commentService.UpdateCommentAsync(commentId, userId, request);
-            return Results.NoContent();
-        })
-            .WithName("UpdateComment")
-            .WithSummary("Update a comment")
-            .WithDescription("Updates a comment with the provided ID.")
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem();
-
-        group.MapDelete("/{commentId}", async (Guid commentId, ClaimsPrincipal principal, ICommentService commentService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            await commentService.DeleteCommentAsync(commentId, userId);
-            return Results.NoContent();
-        })
-            .WithName("DeleteComment")
-            .WithSummary("Delete a comment")
-            .WithDescription("Deletes a comment with the provided ID.")
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem();
+        await commentService.DeleteCommentAsync(commentId, userId);
+        return TypedResults.NoContent();
     }
 }

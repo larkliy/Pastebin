@@ -4,8 +4,9 @@ using Pastebin.DTOs.Like.Responses;
 using Pastebin.DTOs.Shared;
 using Pastebin.Exceptions.Like;
 using Pastebin.Models;
+using Pastebin.Services.Interfaces;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Implementations;
 
 public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeService
 {
@@ -20,19 +21,22 @@ public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeSe
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var totalLikes = await db.Likes.CountAsync(l => l.PasteId == pasteId, cancellationToken);
-
-        var likes = await db.Likes
+        var likesQuery = db.Likes
             .Where(l => l.PasteId == pasteId)
-            .OrderByDescending(l => l.CreatedAt)
+            .OrderByDescending(l => l.CreatedAt);
+
+        var likes = await likesQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(l => new LikeResponse(l.Id, l.UserId, l.PasteId, l.CreatedAt))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = likes.Count > pageSize;
+        var items = hasNextPage ? likes.Take(pageSize) : likes;
+
         logger.LogInformation("Retrieved page {PageNumber} of likes for paste ID '{PasteId}' with page size {PageSize}", pageNumber, pasteId, pageSize);
 
-        return new(likes, totalLikes, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task<PaginatedResponse<LikeResponse>> GetLikesByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -40,19 +44,22 @@ public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeSe
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var count = await db.Likes.CountAsync(l => l.UserId == userId, cancellationToken);
-
-        var likes = await db.Likes
+        var likesQuery = db.Likes
             .Where(l => l.UserId == userId)
-            .OrderByDescending(l => l.CreatedAt)
+            .OrderByDescending(l => l.CreatedAt);
+
+        var likes = await likesQuery
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Take(pageSize + 1)
             .Select(l => new LikeResponse(l.Id, l.UserId, l.PasteId, l.CreatedAt))
             .ToListAsync(cancellationToken);
 
+        var hasNextPage = likes.Count > pageSize;
+        var items = hasNextPage ? likes.Take(pageSize) : likes;
+
         logger.LogInformation("Retrieved page {PageNumber} of likes for user ID '{UserId}' with page size {PageSize}", pageNumber, userId, pageSize);
 
-        return new(likes, count, pageNumber, pageSize);
+        return new(items, pageNumber, pageSize, hasNextPage);
     }
 
     public async Task<LikeCreateResponse> LikePasteAsync(Guid userId, Guid pasteId, CancellationToken cancellationToken = default)

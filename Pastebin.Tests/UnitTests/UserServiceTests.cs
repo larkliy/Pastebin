@@ -5,8 +5,9 @@ using Pastebin.Application;
 using Pastebin.DTOs.User.Requests;
 using Pastebin.Exceptions.User;
 using Pastebin.Models;
-using Pastebin.Services;
 using Moq;
+using Pastebin.Services.Implementations;
+using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Tests.UnitTests;
 

@@ -1,6 +1,6 @@
 using Pastebin.DTOs.CommentVote.Responses;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface ICommentVoteService
 {

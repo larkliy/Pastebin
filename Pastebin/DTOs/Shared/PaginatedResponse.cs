@@ -1,12 +1,18 @@
 ﻿namespace Pastebin.DTOs.Shared;
 
-public class PaginatedResponse<T>(IEnumerable<T> items, int totalCount, int pageNumber, int pageSize)
+public class PaginatedResponse<T>
 {
-    public IEnumerable<T> Items { get; } = items;
-    public int TotalCount { get; } = totalCount;
-    public int PageNumber { get; } = pageNumber;
-    public int PageSize { get; } = pageSize;
-    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public IEnumerable<T> Items { get; }
+    public int PageNumber { get; }
+    public int PageSize { get; }
     public bool HasPreviousPage => PageNumber > 1;
-    public bool HasNextPage => PageNumber < TotalPages;
+    public bool HasNextPage { get; }
+
+    public PaginatedResponse(IEnumerable<T> items, int pageNumber, int pageSize, bool hasNextPage)
+    {
+        Items = items;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        HasNextPage = hasNextPage;
+    }
 }

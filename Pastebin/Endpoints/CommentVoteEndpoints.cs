@@ -1,7 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Pastebin.DTOs.CommentVote.Requests;
 using Pastebin.DTOs.CommentVote.Responses;
-using Pastebin.Services;
+using Pastebin.Services.Interfaces;
 
 namespace Pastebin.Endpoints;
 
@@ -13,22 +14,18 @@ public static class CommentVoteEndpoints
             .WithTags("Comment Votes")
             .RequireAuthorization();
 
-        group.MapPost("/", async (CommentVoteRequest request, ClaimsPrincipal principal, ICommentVoteService voteService) =>
-        {
-            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                return Results.Unauthorized();
-            }
+        group.MapPost("/", VoteOnComment);
+    }
 
-            var response = await voteService.VoteAsync(request.CommentId, userId, request.IsUpvote);
-            return Results.Ok(response);
-        })
-        .WithName("VoteOnComment")
-        .WithSummary("Vote on a comment")
-        .WithDescription("Casts, updates, or removes a vote on a specific comment. If the same vote is sent twice, it's removed.")
-        .Produces<CommentVoteResponse>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status401Unauthorized)
-        .ProducesValidationProblem();
+    private static async Task<Results<Ok<CommentVoteResponse>, UnauthorizedHttpResult>> VoteOnComment(CommentVoteRequest request, ClaimsPrincipal principal, ICommentVoteService voteService)
+    {
+        var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var response = await voteService.VoteAsync(request.CommentId, userId, request.IsUpvote);
+        return TypedResults.Ok(response);
     }
 }

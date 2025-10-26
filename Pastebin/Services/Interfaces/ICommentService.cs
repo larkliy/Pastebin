@@ -2,7 +2,7 @@ using Pastebin.DTOs.Comment.Requests;
 using Pastebin.DTOs.Comment.Responses;
 using Pastebin.DTOs.Shared;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface ICommentService
 {

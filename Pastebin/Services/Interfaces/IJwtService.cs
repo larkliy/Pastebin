@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface IJwtService
 {

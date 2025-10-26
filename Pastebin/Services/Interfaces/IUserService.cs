@@ -2,7 +2,7 @@
 using Pastebin.DTOs.User.Requests;
 using Pastebin.DTOs.User.Responses;
 
-namespace Pastebin.Services;
+namespace Pastebin.Services.Interfaces;
 
 public interface IUserService
 {
@@ -14,4 +14,5 @@ public interface IUserService
     Task<PaginatedResponse<FoundUserResponseUser>> GetUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<UserResponse> UpdateUserByIdAsync(Guid userId, UpdateUserRequest updateRequest, CancellationToken cancellationToken = default);
     Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task LogoutAsync(Guid userId, CancellationToken cancellationToken = default);
 }

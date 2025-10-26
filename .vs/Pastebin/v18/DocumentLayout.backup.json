@@ -1,7 +1,24 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Heller\\source\\repos\\Pastebin\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\dtos\\shared\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\dtos\\shared\\paginatedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|c:\\users\\heller\\source\\repos\\pastebin\\pastebin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A3EF08CB-9EF9-392D-EB08-47AED10647BD}|Pastebin\\Pastebin.csproj|solutionrelative:pastebin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +26,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 48,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PaginatedResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "RelativeDocumentMoniker": "Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "RelativeToolTip": "Pastebin\\DTOs\\Shared\\PaginatedResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:31:40.259Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "RelativeToolTip": "Pastebin\\Services\\Interfaces\\IUserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:29:27.353Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:42:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
@@ -190,6 +233,36 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Implementations\\UserService.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Services\\Implementations\\UserService.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Services\\Implementations\\UserService.cs",
+              "RelativeToolTip": "Pastebin\\Services\\Implementations\\UserService.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAiwBcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T09:22:32.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
+              "RelativeDocumentMoniker": "Pastebin\\Program.cs",
+              "ToolTip": "C:\\Users\\Heller\\source\\repos\\Pastebin\\Pastebin\\Program.cs",
+              "RelativeToolTip": "Pastebin\\Program.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABkAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-18T20:27:28.921Z",
+              "EditorCaption": ""
             }
           ]
         }
