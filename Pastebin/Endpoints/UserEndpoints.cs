@@ -20,6 +20,7 @@ public static class UserEndpoints
         group.MapGet("/", GetUsers).RequireAuthorization();
         group.MapDelete("/me", DeleteCurrentUser).RequireAuthorization();
         group.MapPut("/me", UpdateCurrentUser).RequireAuthorization();
+        group.MapPost("/logout", Logout);
     }
 
     private static async Task<Created<UserCreateResponse>> RegisterUser(UserCreateRequest request, IUserService userService)
@@ -56,6 +57,18 @@ public static class UserEndpoints
 
         await userService.DeleteUserByIdAsync(userId.Value);
         return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok, UnauthorizedHttpResult>> Logout(ClaimsPrincipal principal, IUserService userService)
+    {
+        var userId = principal.GetUserId();
+        if (userId is null)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        await userService.LogoutAsync(userId.Value);
+        return TypedResults.Ok();
     }
 
     private static async Task<Results<Ok<UserResponse>, UnauthorizedHttpResult>> UpdateCurrentUser(ClaimsPrincipal principal, UpdateUserRequest request, IUserService userService)

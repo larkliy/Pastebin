@@ -16,7 +16,6 @@ public static class LikeEndpoints
         group.MapGet("/my-likes", GetMyLikes);
         group.MapGet("/paste/{pasteId:guid}", GetLikesByPasteId).AllowAnonymous();
         group.MapPost("/paste", LikePaste);
-        group.MapPost("/logout", Logout);
         group.MapDelete("/paste/{pasteId:guid}", DeleteLike);
     }
 
@@ -48,18 +47,6 @@ public static class LikeEndpoints
 
         var response = await likeService.LikePasteAsync(userId.Value, pasteId);
         return TypedResults.Created($"/api/likes/paste/{response.Id}", response);
-    }
-
-    private static async Task<Results<Ok, UnauthorizedHttpResult>> Logout(ClaimsPrincipal principal, IUserService userService)
-    {
-        var userId = principal.GetUserId();
-        if (userId is null)
-        {
-            return TypedResults.Unauthorized();
-        }
-
-        await userService.LogoutAsync(userId.Value);
-        return TypedResults.Ok();
     }
 
     private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteLike(ClaimsPrincipal principal, Guid pasteId, ILikeService likeService)
