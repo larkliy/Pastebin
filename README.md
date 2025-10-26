@@ -80,6 +80,7 @@ All endpoints are prefixed with `/api`.
 | `POST` | `/refresh-token`      | Refreshes the access token using a refresh token. | No            |
 | `GET`  | `/`                   | Gets a paginated list of all users.               | Yes           |
 | `PUT`  | `/me`                 | Updates the current authenticated user's profile. | Yes           |
+| `POST`  | `/logout`            | Clear user's refresh token and this expiry.       | Yes           |
 | `DELETE`| `/me`                | Deletes the current authenticated user's account. | Yes           |
 
 ---
