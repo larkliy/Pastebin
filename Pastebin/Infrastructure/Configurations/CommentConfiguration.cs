@@ -14,7 +14,7 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.HasOne(e => e.User)
               .WithMany(u => u.Comments)
               .HasForeignKey(e => e.UserId)
-              .OnDelete(DeleteBehavior.SetNull);
+              .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(e => e.Paste)
               .WithMany(p => p.Comments)

@@ -1,17 +1,17 @@
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Pastebin.Infrastructure;
-using Pastebin.DTOs.User.Requests;
-using Pastebin.Exceptions.User;
-using Pastebin.Models;
-using Moq;
 using Pastebin.Services.Implementations;
 using Pastebin.Services.Interfaces;
+using Moq;
+using Pastebin.Models;
+using FluentAssertions;
+using Pastebin.Exceptions.User;
+using Pastebin.DTOs.User.Requests;
 
 namespace Pastebin.Tests.UnitTests;
 
-public class UserServiceTests : IDisposable
+public class UserServiceTests
 {
     private readonly AppDbContext _dbContext;
     private readonly UserService _userService;
@@ -23,121 +23,57 @@ public class UserServiceTests : IDisposable
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        _dbContext = new AppDbContext(options);
 
-        _jwtServiceMock = new Mock<IJwtService>();
-        _loggerMock = new Mock<ILogger<UserService>>();
+        _dbContext = new(options);
+        _jwtServiceMock = new();
+        _loggerMock = new();
 
-        _userService = new UserService(_dbContext, _jwtServiceMock.Object, _loggerMock.Object);
-    }
-
-    private async Task SeedDatabaseAsync()
-    {
-        var users = new List<User>
-        {
-            new User { Id = Guid.NewGuid(), Username = "testuser1", Email = "test1@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123") },
-            new User { Id = Guid.NewGuid(), Username = "testuser2", Email = "test2@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password456") }
-        };
-
-        await _dbContext.Users.AddRangeAsync(users);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    public async Task UserExistsAsync_ShouldReturnTrue_WhenUserExists()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.UserExistsAsync("testuser1");
-
-        // Assert
-        result.Should().BeTrue();
-    }
-
-    public async Task UserExistsAsync_ShouldReturnFalse_WhenUserDoesNotExist()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.UserExistsAsync("nonexistentuser");
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    public async Task EmailExistsAsync_ShouldReturnTrue_WhenEmailExists()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.EmailExistsAsync("test1@example.com");
-
-        // Assert
-        result.Should().BeTrue();
-    }
-
-    public async Task EmailExistsAsync_ShouldReturnFalse_WhenEmailDoesNotExist()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.EmailExistsAsync("nonexistent@example.com");
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    public async Task CreateUserAsync_ShouldCreateUser_WhenUsernameAndEmailAreUnique()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.CreateUserAsync("newuser", "new@example.com", "password");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Username.Should().Be("newuser");
-        result.Email.Should().Be("new@example.com");
-
-        var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == "newuser");
-        userInDb.Should().NotBeNull();
-    }
-
-    public async Task CreateUserAsync_ShouldThrowUserAlreadyExistsException_WhenUsernameExists()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<UserAlreadyExistsException>(() =>
-            _userService.CreateUserAsync("testuser1", "new@example.com", "password"));
-    }
-
-    public async Task CreateUserAsync_ShouldThrowUserAlreadyExistsException_WhenEmailExists()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<UserAlreadyExistsException>(() =>
-            _userService.CreateUserAsync("newuser", "test1@example.com", "password"));
-    }
-
-    public async Task AuthenticateUserAsync_ShouldReturnLoginResponse_WhenCredentialsAreValid()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
         _jwtServiceMock.Setup(s => s.GenerateTokenAsync(It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync("access_token");
         _jwtServiceMock.Setup(s => s.GenerateRefreshToken()).Returns("refresh_token");
 
+        _userService = new(_dbContext, _jwtServiceMock.Object, _loggerMock.Object);
+    }
+
+    [Fact]
+    public async Task CreateUserAsync_ShouldCreateUser_WhenUsernameAndEmailAreUnique()
+    {
+        // Arrange
+        var result = await _userService.CreateUserAsync(
+            "newuser", "new@example.com", "password", TestContext.Current.CancellationToken);
+
+        // Assert
+        var user = await _dbContext.Users.FirstOrDefaultAsync(TestContext.Current.CancellationToken);
+        user.Should().NotBeNull();
+        result!.Username.Should().Be("newuser");
+        user!.Username.Should().Be("newuser");
+        user!.Email.Should().Be("new@example.com");
+
+        BCrypt.Net.BCrypt.Verify("password", user!.PasswordHash).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateUserAsync_ShouldThrow_WhenUsernameExists()
+    {
+        // Arrange
+        await _userService.CreateUserAsync(
+            "testuser1", "new@example.com", "password", TestContext.Current.CancellationToken);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UserAlreadyExistsException>(() =>
+            _userService.CreateUserAsync("testuser1", "new@example.com", "password", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task AuthenticateUserAsync_ShouldReturnLoginResponse_WhenCredentialsAreValid()
+    {
+        // Arrange
+        await _userService.CreateUserAsync(
+            "testuser1", "test1@example.com", "password123", TestContext.Current.CancellationToken);
+
         // Act
-        var result = await _userService.AuthenticateUserAsync("testuser1", "password123");
+        var result = await _userService.AuthenticateUserAsync(
+            "testuser1", "password123", TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -145,113 +81,78 @@ public class UserServiceTests : IDisposable
         result.RefreshToken.Should().Be("refresh_token");
     }
 
-    public async Task AuthenticateUserAsync_ShouldThrowInvalidCredentialsException_WhenUsernameIsInvalid()
+    [Fact]
+    public async Task AuthenticateUserAsync_ShouldThrow_WhenPasswordIsInvalid()
     {
         // Arrange
-        await SeedDatabaseAsync();
+        await _userService.CreateUserAsync(
+            "testuser1", "test1@example.com", "password123", TestContext.Current.CancellationToken);
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidCredentialsException>(() =>
-            _userService.AuthenticateUserAsync("nonexistentuser", "password123"));
+            _userService.AuthenticateUserAsync("testuser1", "wrongpassword", TestContext.Current.CancellationToken));
     }
 
-    public async Task AuthenticateUserAsync_ShouldThrowInvalidCredentialsException_WhenPasswordIsInvalid()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidCredentialsException>(() =>
-            _userService.AuthenticateUserAsync("testuser1", "wrongpassword"));
-    }
-
-    public async Task RefreshTokenAsync_ShouldReturnNewLoginResponse_WhenTokenIsValid()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-        var user = await _dbContext.Users.FirstAsync();
-        user.RefreshToken = "valid_refresh_token";
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1);
-        await _dbContext.SaveChangesAsync();
-
-        _jwtServiceMock.Setup(s => s.GenerateTokenAsync(It.IsAny<Guid>(), It.IsAny<string>()))
-            .ReturnsAsync("new_access_token");
-        _jwtServiceMock.Setup(s => s.GenerateRefreshToken()).Returns("new_refresh_token");
-
-        // Act
-        var result = await _userService.RefreshTokenAsync("valid_refresh_token");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.AccessToken.Should().Be("new_access_token");
-        result.RefreshToken.Should().Be("new_refresh_token");
-    }
-
-    public async Task RefreshTokenAsync_ShouldThrowInvalidRefreshTokenException_WhenTokenIsInvalid()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidRefreshTokenException>(() =>
-            _userService.RefreshTokenAsync("invalid_refresh_token"));
-    }
-
-    public async Task RefreshTokenAsync_ShouldThrowInvalidRefreshTokenException_WhenTokenIsExpired()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-        var user = await _dbContext.Users.FirstAsync();
-        user.RefreshToken = "expired_refresh_token";
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(-1);
-        await _dbContext.SaveChangesAsync();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidRefreshTokenException>(() =>
-            _userService.RefreshTokenAsync("expired_refresh_token"));
-    }
-
-    public async Task GetUsersAsync_ShouldReturnPaginatedUsers()
-    {
-        // Arrange
-        await SeedDatabaseAsync();
-
-        // Act
-        var result = await _userService.GetUsersAsync(1, 1);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Items.Should().HaveCount(1);
-        result.Items.First().Username.Should().Be("testuser1");
-    }
-
+    [Fact]
     public async Task UpdateUserByIdAsync_ShouldUpdateUser_WhenDataIsValid()
     {
         // Arrange
-        await SeedDatabaseAsync();
-        var user = await _dbContext.Users.FirstAsync();
-        var request = new UpdateUserRequest(user.Id.ToString(),
-            "updateduser",
-            "updated@example.com", string.Empty
+        await _userService.CreateUserAsync(
+            "testuser1", "test1@example.com", "password123", TestContext.Current.CancellationToken);
+        var user = await _dbContext.Users.FirstAsync(TestContext.Current.CancellationToken);
+        var request = new UpdateUserRequest(
+            Username: "updateduser",
+            Email: "updated@example.com",
+            Password: "newpassword",
+            ImageUrl: string.Empty
         );
 
         // Act
-        var result = await _userService.UpdateUserByIdAsync(user.Id, request);
+        var result = await _userService.UpdateUserByIdAsync(user.Id, request, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
         result.Username.Should().Be("updateduser");
         result.Email.Should().Be("updated@example.com");
 
-        var updatedUserInDb = await _dbContext.Users.FindAsync(user.Id);
-        updatedUserInDb.Should().NotBeNull();
+        var updatedUserInDb = await _dbContext.Users.FindAsync([user.Id], TestContext.Current.CancellationToken);
+
+        updatedUserInDb!.Should().NotBeNull();
         updatedUserInDb!.Username.Should().Be("updateduser");
         BCrypt.Net.BCrypt.Verify("newpassword", updatedUserInDb.PasswordHash).Should().BeTrue();
     }
-    
-    public void Dispose()
+
+    [Fact]
+    public async Task DeleteUserByIdAsync_ShouldDeleteUser_WhenUserExists()
     {
-        _dbContext.Database.EnsureDeleted();
-        _dbContext.Dispose();
+        // Arrange
+        await _userService.CreateUserAsync(
+            "testuser1", "test1@example.com", "password123", TestContext.Current.CancellationToken);
+        var user = await _dbContext.Users.FirstAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        await _userService.DeleteUserByIdAsync(user.Id, TestContext.Current.CancellationToken);
+
+        // Assert
+        (await _dbContext.Users.AnyAsync(TestContext.Current.CancellationToken)).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_ShouldReturnPaginatedUsers()
+    {
+        // Arrange
+        for (int i = 0; i < 15; i++)
+            await _userService.CreateUserAsync(
+                $"testuser{i}", $"test{i}@example.com", "password", TestContext.Current.CancellationToken);
+                
+        // Act
+        var page1 = await _userService.GetUsersAsync(1, 10, TestContext.Current.CancellationToken);
+        var page2 = await _userService.GetUsersAsync(2, 10, TestContext.Current.CancellationToken);
+
+        // Assert
+        page1.Items.Should().HaveCount(10);
+        page2.Items.Should().HaveCount(5);
+        page1.HasNextPage.Should().BeTrue();
+        page2.HasNextPage.Should().BeFalse();
     }
 }

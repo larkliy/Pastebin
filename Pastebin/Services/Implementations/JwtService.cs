@@ -18,6 +18,7 @@ public class JwtService(IOptions<JwtSettings> jwtSettings, ILogger<JwtService> l
         {
             new(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, username),
+            new(JwtRegisteredClaimNames.Name, username),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
