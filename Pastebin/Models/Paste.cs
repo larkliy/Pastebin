@@ -6,7 +6,6 @@ public class Paste
     public required string Title { get; set; }
     public required string Content { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
 
     public bool IsPrivate { get; set; }
     public string? PasswordHash { get; set; }

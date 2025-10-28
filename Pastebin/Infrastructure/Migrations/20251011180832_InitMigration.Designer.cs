@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Pastebin.Application;
+using Pastebin.Infrastructure;
 
 #nullable disable
 
-namespace Pastebin.Application.Migrations
+namespace Pastebin.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20251011180832_InitMigration")]

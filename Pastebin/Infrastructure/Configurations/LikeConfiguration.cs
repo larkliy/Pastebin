@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pastebin.Models;
 
-namespace Pastebin.Application.Configurations;
+namespace Pastebin.Infrastructure.Configurations;
 
 public class LikeConfiguration : IEntityTypeConfiguration<Like>
 {

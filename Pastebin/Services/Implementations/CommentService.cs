@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Pastebin.Application;
+using Pastebin.Infrastructure;
 using Pastebin.DTOs.Comment.Requests;
 using Pastebin.DTOs.Comment.Responses;
 using Pastebin.DTOs.Shared;

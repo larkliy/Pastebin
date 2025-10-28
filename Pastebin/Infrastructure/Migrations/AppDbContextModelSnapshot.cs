@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Pastebin.Application;
+using Pastebin.Infrastructure;
 
 #nullable disable
 
-namespace Pastebin.Application.Migrations
+namespace Pastebin.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251011202515_UpdateModels")]
-    partial class UpdateModels
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -24,6 +21,9 @@ namespace Pastebin.Application.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CommentId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
@@ -42,6 +42,8 @@ namespace Pastebin.Application.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
 
                     b.HasIndex("PasteId");
 
@@ -79,6 +81,9 @@ namespace Pastebin.Application.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PasteId")
@@ -150,6 +155,9 @@ namespace Pastebin.Application.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -177,6 +185,10 @@ namespace Pastebin.Application.Migrations
 
             modelBuilder.Entity("Pastebin.Models.Comment", b =>
                 {
+                    b.HasOne("Pastebin.Models.Comment", null)
+                        .WithMany("Replies")
+                        .HasForeignKey("CommentId");
+
                     b.HasOne("Pastebin.Models.Paste", "Paste")
                         .WithMany("Comments")
                         .HasForeignKey("PasteId")
@@ -244,6 +256,8 @@ namespace Pastebin.Application.Migrations
 
             modelBuilder.Entity("Pastebin.Models.Comment", b =>
                 {
+                    b.Navigation("Replies");
+
                     b.Navigation("Votes");
                 });
 

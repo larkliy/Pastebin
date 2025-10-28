@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Pastebin.Application;
+using Pastebin.Infrastructure;
 using Pastebin.DTOs.User.Requests;
 using Pastebin.Exceptions.User;
 using Pastebin.Models;

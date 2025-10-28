@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Pastebin.Application.Migrations
+namespace Pastebin.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateModels : Migration

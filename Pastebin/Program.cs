@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Pastebin.Application;
+using Pastebin.Infrastructure;
 using Pastebin.ConfigurationSettings;
 using Pastebin.Endpoints;
 using Pastebin.Handlers;
