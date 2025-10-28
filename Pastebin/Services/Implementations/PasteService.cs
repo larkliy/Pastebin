@@ -12,6 +12,12 @@ namespace Pastebin.Services.Implementations;
 
 public class PasteService(AppDbContext db, ILogger<PasteService> logger) : IPasteService
 {
+    public async Task<bool> PasteExistsAsync(Guid pasteId, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Checking if paste with ID '{PasteId}' exists.", pasteId);
+        return await db.Pastes.AnyAsync(p => p.Id == pasteId, cancellationToken);
+    }
+    
     public async Task<PasteCreateResponse> CreatePasteAsync(Guid? userId, PasteCreateRequest request, CancellationToken cancellationToken = default)
     {
         if (request.IsPrivate && string.IsNullOrWhiteSpace(request.Password))

@@ -5,10 +5,11 @@ using Pastebin.DTOs.Shared;
 using Pastebin.Exceptions.Like;
 using Pastebin.Models;
 using Pastebin.Services.Interfaces;
+using Pastebin.Exceptions.Paste;
 
 namespace Pastebin.Services.Implementations;
 
-public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeService
+public class LikeService(AppDbContext db, IPasteService pasteService, ILogger<LikeService> logger) : ILikeService
 {
     public async Task<bool> LikeExistsAsync(Guid userId, Guid pasteId, CancellationToken cancellationToken = default)
     {
@@ -68,6 +69,12 @@ public class LikeService(AppDbContext db, ILogger<LikeService> logger) : ILikeSe
         {
             logger.LogWarning("Attempted to create like with user ID '{UserId}' and paste ID '{PasteId}' that already exists.", userId, pasteId);
             throw new LikeAlreadyExistsException($"Like with user ID '{userId}' and paste ID '{pasteId}' already exists.");
+        }
+
+        if (!await pasteService.PasteExistsAsync(pasteId, cancellationToken))
+        {
+            logger.LogWarning("Attempted to like non-existent paste with ID '{PasteId}'", pasteId);
+            throw new PasteNotFoundException($"Paste with ID '{pasteId}' not found.");
         }
 
         var like = new Like

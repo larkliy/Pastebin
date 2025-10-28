@@ -10,6 +10,7 @@ public interface IPasteService
     Task<PaginatedResponse<PasteResponse>> GetPastesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<PaginatedResponse<PasteResponse>> GetPastesByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<PasteDetailsResponse> GetPasteDetailsAsync(Guid pasteId, Guid? userId, string? password, CancellationToken cancellationToken = default);
+    Task<bool> PasteExistsAsync(Guid pasteId, CancellationToken cancellationToken = default);
     Task UpdatePasteAsync(Guid pasteId, Guid userId, PasteUpdateRequest request, CancellationToken cancellationToken = default);
     Task DeletePasteAsync(Guid pasteId, Guid userId, CancellationToken cancellationToken = default);
 }
