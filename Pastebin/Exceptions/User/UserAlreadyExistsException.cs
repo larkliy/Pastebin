@@ -2,10 +2,8 @@
 
 namespace Pastebin.Exceptions.User;
 
-public class UserAlreadyExistsException : PastebinException
+public class UserAlreadyExistsException(string obj) : PastebinException(obj)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.Conflict;
-
-    public UserAlreadyExistsException(string obj) : base(obj) { }
 }
 

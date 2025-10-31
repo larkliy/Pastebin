@@ -6,10 +6,17 @@ using Pastebin.DTOs.User.Responses;
 using Pastebin.Exceptions.User;
 using Pastebin.Models;
 using Pastebin.Services.Interfaces;
+using Microsoft.Extensions.Options;
+using Pastebin.ConfigurationSettings;
 
 namespace Pastebin.Services.Implementations;
 
-public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserService> logger) : IUserService
+public class UserService(
+    AppDbContext db,
+    IJwtService jwtService,
+    IEmailService emailService,
+    IOptions<ApplicationSettings> applicationSettings,
+    ILogger<UserService> logger) : IUserService
 {
     public async Task<bool> UserExistsAsync(string username, CancellationToken cancellationToken = default)
     {
@@ -43,12 +50,21 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             Username = username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
             Email = email,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+
+            EmailConfirmationToken = Guid.NewGuid().ToString(),
+            EmailConfirmationTokenExpiresAt = DateTime.UtcNow.AddHours(24)
         };
 
         await db.Users.AddAsync(user, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Created new user with ID '{UserId}'", user.Id);
+        
+
+        var confirmationLink = $"{applicationSettings.Value.FrontendUrl}/api/users/confirm-email?email={user.Email}&token={user.EmailConfirmationToken}";
+
+        var message = $"<p>Please confirm your email by clicking <a href='{confirmationLink}'>here</a>.</p>";
+        await emailService.SendEmailAsync(user.Email, "Confirm your email", message, cancellationToken);
 
         return new(user.Id, user.Username, user.Email, user.CreatedAt);
     }
@@ -63,7 +79,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 
-        var accessToken = await jwtService.GenerateTokenAsync(user.Id, user.Username);
+        var accessToken = await jwtService.GenerateTokenAsync(user);
         var refreshToken = jwtService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
@@ -86,7 +102,7 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
             throw new InvalidRefreshTokenException("Invalid or expired refresh token.");
         }
 
-        var newAccessToken = await jwtService.GenerateTokenAsync(user.Id, user.Username);
+        var newAccessToken = await jwtService.GenerateTokenAsync(user);
         var newRefreshToken = jwtService.GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
@@ -179,6 +195,27 @@ public class UserService(AppDbContext db, IJwtService jwtService, ILogger<UserSe
         await db.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("Deleted user with ID '{UserId}'", userId);
+    }
+
+    public async Task<EmailConfirmationResponse> ConfirmEmailAsync(string email, string token, CancellationToken cancellationToken = default)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+
+        if (user == null || user.EmailConfirmationToken != token || user.EmailConfirmationTokenExpiresAt <= DateTime.UtcNow)
+        {
+            logger.LogWarning("Invalid email confirmation attempt for email '{Email}'", email);
+            throw new InvalidEmailConfirmationTokenException("Invalid email confirmation token.");
+        }
+
+        user.IsEmailConfirmed = true;
+        user.EmailConfirmationToken = null;
+        user.EmailConfirmationTokenExpiresAt = null;
+
+        await db.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Confirmed email for user with email '{Email}'", email);
+
+        return new(token, user.EmailConfirmationTokenExpiresAt);
     }
 
     public async Task LogoutAsync(Guid userId, CancellationToken cancellationToken = default)

@@ -3,11 +3,13 @@ using Microsoft.Extensions.Logging;
 using Pastebin.Infrastructure;
 using Pastebin.Services.Implementations;
 using Pastebin.Services.Interfaces;
-using Moq;
 using Pastebin.Models;
 using FluentAssertions;
 using Pastebin.Exceptions.User;
 using Pastebin.DTOs.User.Requests;
+using Microsoft.Extensions.Options;
+using Pastebin.ConfigurationSettings;
+using Moq;
 
 namespace Pastebin.Tests.UnitTests;
 
@@ -16,6 +18,8 @@ public class UserServiceTests
     private readonly AppDbContext _dbContext;
     private readonly UserService _userService;
     private readonly Mock<IJwtService> _jwtServiceMock;
+    private readonly Mock<IEmailService> _emailServiceMock;
+    private readonly Mock<IOptions<ApplicationSettings>> _applicationSettingsMock;
     private readonly Mock<ILogger<UserService>> _loggerMock;
 
     public UserServiceTests()
@@ -27,12 +31,25 @@ public class UserServiceTests
         _dbContext = new(options);
         _jwtServiceMock = new();
         _loggerMock = new();
+        _emailServiceMock = new();
+        _applicationSettingsMock = new();
 
-        _jwtServiceMock.Setup(s => s.GenerateTokenAsync(It.IsAny<Guid>(), It.IsAny<string>()))
+        _jwtServiceMock.Setup(s => s.GenerateTokenAsync(It.IsAny<User>()))
             .ReturnsAsync("access_token");
+
         _jwtServiceMock.Setup(s => s.GenerateRefreshToken()).Returns("refresh_token");
 
-        _userService = new(_dbContext, _jwtServiceMock.Object, _loggerMock.Object);
+        _applicationSettingsMock.Setup(s => s.Value).Returns(new ApplicationSettings
+        {
+            FrontendUrl = "https://localhost:7172"
+        });
+
+        _userService = new(
+            _dbContext,
+            _jwtServiceMock.Object,
+            _emailServiceMock.Object,
+            _applicationSettingsMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]

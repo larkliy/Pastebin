@@ -7,6 +7,7 @@ using Moq;
 using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Pastebin.Models;
 
 namespace Pastebin.UnitTests;
 
@@ -36,11 +37,18 @@ public class JwtServiceTests
     public async Task GenerateTokenAsync_ShouldReturnToken()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var username = "testuser";
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Username = "testuser",
+            Email = "test@example.com",
+            PasswordHash = "password",
+            IsEmailConfirmed = true,
+            CreatedAt = DateTime.UtcNow
+        };
 
         // Act
-        var result = await _jwtService.GenerateTokenAsync(userId, username);
+        var result = await _jwtService.GenerateTokenAsync(user);
 
         // Assert
         result.Should().NotBeNull();
@@ -61,7 +69,16 @@ public class JwtServiceTests
     public async Task ValidateTokenAsync_ShouldReturnPrincipal_WhenTokenIsValid()
     {
         // Arrange
-        var token = await _jwtService.GenerateTokenAsync(Guid.NewGuid(), "testuser");
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Username = "testuser",
+            Email = "test@example.com",
+            PasswordHash = "password",
+            IsEmailConfirmed = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        var token = await _jwtService.GenerateTokenAsync(user);
 
         // Act
         var result = await _jwtService.ValidateTokenAsync(token);
@@ -84,13 +101,20 @@ public class JwtServiceTests
     [Fact]
     public async Task GenerateTokenAsync_ShouldContainUserClaims()
     {
-        var userId = Guid.NewGuid();
-        var username = "testuser";
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Username = "testuser",
+            Email = "test@example.com",
+            PasswordHash = "password",
+            IsEmailConfirmed = true,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        var token = await _jwtService.GenerateTokenAsync(userId, username);
+        var token = await _jwtService.GenerateTokenAsync(user);
         var principal = await _jwtService.ValidateTokenAsync(token);
 
-        principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value.Should().Be(userId.ToString());
-        principal?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value.Should().Be(username);
+        principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value.Should().Be(user.Id.ToString());
+        principal?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value.Should().Be(user.Username);
     }
 }

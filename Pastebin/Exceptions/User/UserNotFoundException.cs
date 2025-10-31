@@ -2,9 +2,7 @@
 
 namespace Pastebin.Exceptions.User;
 
-public class UserNotFoundException : PastebinException
+public class UserNotFoundException(string message) : PastebinException(message)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.NotFound;
-
-    public UserNotFoundException(string message) : base(message) { }
 }

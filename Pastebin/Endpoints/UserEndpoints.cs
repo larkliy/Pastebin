@@ -19,6 +19,7 @@ public static class UserEndpoints
         group.MapPost("/login", LoginUser).AllowAnonymous();
         group.MapPost("/refresh-token", RefreshToken).AllowAnonymous();
         group.MapGet("/", GetUsers).RequireAuthorization();
+        group.MapGet("/confirm-email", ConfirmEmail).AllowAnonymous();
         group.MapDelete("/me", DeleteCurrentUser).RequireAuthorization();
         group.MapPut("/me", UpdateCurrentUser).RequireAuthorization();
         group.MapPost("/logout", Logout);
@@ -45,6 +46,13 @@ public static class UserEndpoints
     private static async Task<Ok<PaginatedResponse<FoundUserResponseUser>>> GetUsers(int pageNumber, int pageSize, IUserService userService)
     {
         var response = await userService.GetUsersAsync(pageNumber, pageSize);
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Ok<EmailConfirmationResponse>> ConfirmEmail(EmailConfirmationRequest confirmationRequest, IUserService userService)
+    {
+        var response = await userService.ConfirmEmailAsync(confirmationRequest.Email, confirmationRequest.EmailConfirmationToken);
+
         return TypedResults.Ok(response);
     }
 

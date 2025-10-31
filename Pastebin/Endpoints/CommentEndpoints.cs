@@ -12,7 +12,9 @@ public static class CommentEndpoints
 {
     public static void MapCommentEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/comments").WithTags("Comments").RequireAuthorization();
+        var group = app.MapGroup("/api/comments")
+            .WithTags("Comments")
+            .RequireAuthorization("EmailConfirmed");
 
         group.MapGet("/paste/{pasteId:guid}", GetComments).AllowAnonymous();
         group.MapGet("/user/{userId:guid}", GetCommentsByUserId).AllowAnonymous();

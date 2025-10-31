@@ -3,9 +3,7 @@ using System.Net;
 
 namespace Pastebin.Exceptions.Comment;
 
-public class CommentNotFoundException : PastebinException
+public class CommentNotFoundException(string message) : PastebinException(message)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.NotFound;
-    public CommentNotFoundException(string message) : base(message) {}
-
 }

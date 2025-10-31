@@ -11,7 +11,9 @@ public static class LikeEndpoints
 {
     public static void MapLikeEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/likes").WithTags("Likes").RequireAuthorization();
+        var group = app.MapGroup("/api/likes")
+            .WithTags("Likes")
+            .RequireAuthorization("EmailConfirmed");
 
         group.MapGet("/my-likes", GetMyLikes);
         group.MapGet("/paste/{pasteId:guid}", GetLikesByPasteId).AllowAnonymous();

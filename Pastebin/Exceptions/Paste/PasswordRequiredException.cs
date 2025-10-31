@@ -2,8 +2,7 @@ using System.Net;
 
 namespace Pastebin.Exceptions.Paste;
 
-public class PasswordRequiredException : PastebinException
+public class PasswordRequiredException(string message) : PastebinException(message)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
-    public PasswordRequiredException(string message) : base(message) { }
 }

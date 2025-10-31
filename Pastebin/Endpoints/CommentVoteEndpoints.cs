@@ -13,7 +13,7 @@ public static class CommentVoteEndpoints
     {
         var group = app.MapGroup("/api/comments/vote")
             .WithTags("Comment Votes")
-            .RequireAuthorization();
+            .RequireAuthorization("EmailConfirmed");
 
         group.MapPost("/", VoteOnComment);
     }

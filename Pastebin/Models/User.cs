@@ -13,8 +13,15 @@ public class User
     public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }
 
+
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
+
+
+    public bool IsEmailConfirmed { get; set; } = false;
+    public string? EmailConfirmationToken { get; set; }
+    public DateTime? EmailConfirmationTokenExpiresAt { get; set; }
+    
 
     public virtual ICollection<Paste> Pastes { get; set; } = new List<Paste>();
     public virtual ICollection<Like> Likes { get; set; } = new List<Like>();

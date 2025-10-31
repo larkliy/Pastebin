@@ -3,8 +3,7 @@ using System.Net;
 
 namespace Pastebin.Exceptions.Paste;
 
-public class InvalidPasswordException : PastebinException
+public class InvalidPasswordException(string message) : PastebinException(message)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
-    public InvalidPasswordException(string message) : base(message) { }
 }

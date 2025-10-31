@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Pastebin.ConfigurationSettings;
+using Pastebin.Models;
 using Pastebin.Services.Interfaces;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -12,14 +13,15 @@ public class JwtService(IOptions<JwtSettings> jwtSettings, ILogger<JwtService> l
 {
     private readonly JsonWebTokenHandler _tokenHandler = new();
 
-    public Task<string> GenerateTokenAsync(Guid userId, string username)
+    public Task<string> GenerateTokenAsync(User user)
     {
         var claims = new Claim[]
         {
-            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new(JwtRegisteredClaimNames.UniqueName, username),
-            new(JwtRegisteredClaimNames.Name, username),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new(JwtRegisteredClaimNames.Name, user.Username),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("EmailConfirmed", user.IsEmailConfirmed.ToString())
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -33,7 +35,7 @@ public class JwtService(IOptions<JwtSettings> jwtSettings, ILogger<JwtService> l
                 SecurityAlgorithms.HmacSha256Signature)
         };
 
-        logger.LogInformation("Generating JWT token for user {UserId} with expiry {Expiry} hours", userId, jwtSettings.Value.ExpiryInHours);
+        logger.LogInformation("Generating JWT token for user {UserId} with expiry {Expiry} hours", user.Id, jwtSettings.Value.ExpiryInHours);
 
         return Task.FromResult(_tokenHandler.CreateToken(tokenDescriptor));
     }

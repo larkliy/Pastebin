@@ -14,7 +14,9 @@ public static class PasteEndpoints
 {
     public static void MapPasteEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/pastes").WithTags("Pastes").RequireAuthorization();
+        var group = app.MapGroup("/api/pastes")
+            .WithTags("Pastes")
+            .RequireAuthorization("EmailConfirmed");
 
         group.MapGet("/{id:guid}", GetPasteDetails).AllowAnonymous();
         group.MapGet("/my-pastes", GetMyPastes);

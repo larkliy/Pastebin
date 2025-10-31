@@ -2,8 +2,7 @@
 
 namespace Pastebin.Exceptions.User;
 
-public class InvalidRefreshTokenException : PastebinException
+public class InvalidRefreshTokenException(string message) : PastebinException(message)
 {
     public override HttpStatusCode StatusCode => HttpStatusCode.Unauthorized;
-    public InvalidRefreshTokenException(string message) : base(message) { }
 }

@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging;
 using Pastebin.Services.Implementations;
 using Pastebin.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using FluentAssertions;
 using Pastebin.Services.Interfaces;
 using Pastebin.Models;
 using Pastebin.Exceptions.Like;
+using Moq;
 
 namespace Pastebin.Tests.UnitTests;
 
